@@ -251,7 +251,7 @@ Section Proofs.
                   rewrite e in n.
                   destruct wltu eqn:G in n; [contradiction|].
                   rewrite wltu_ge, wordToNat_natToWord, wordToNat_natToWord in G;
-                    [destruct (le_lt_or_eq _ _ G); try lia; rewrite H10 in *; contradiction
+                    [destruct (le_lt_eq_dec _ _ G) as [H10 | H10]; try lia; rewrite H10 in *; contradiction
                     |apply zero_lt_pow2 | ].
                   unfold lgSize, size.
                   apply (Nat.le_lt_trans _ (2^ (Nat.log2_up sizeR)));
@@ -309,7 +309,7 @@ Section Proofs.
           -- rewrite wltu_ge in G0; destruct wltu eqn:G1 in G0.
              ++ exfalso.
                 do 3 rewrite wordToNat_natToWord in G0.
-                ** destruct (le_lt_or_eq _ _ G0); try lia.
+                ** destruct (le_lt_eq_dec _ _ G0) as [H0 | H0]; try lia.
                    rewrite H0 in n; contradiction.
                 ** apply zero_lt_pow2.
                 ** rewrite wordToNat_natToWord; apply zero_lt_pow2.
@@ -361,7 +361,7 @@ Section Proofs.
                 rewrite e, Zmod_0_l, Z.mod_small in G0;
                   [|split; try lia].
                 ** rewrite Nat2Z.id in G0.
-                   destruct (le_lt_or_eq _ _ G0); [lia|].
+                   destruct (le_lt_eq_dec _ _ G0) as [H0 | H0]; [lia|].
                    rewrite H0 in n; simpl in n; contradiction.
                 ** unfold lgSize; rewrite sizeSum.
                    rewrite pow2_of_nat, <- Nat2Z.inj_lt.
@@ -390,12 +390,12 @@ Section Proofs.
              ++ rewrite Z2Nat.id; [split|]; auto.
                 unfold lgSize; rewrite sizeSum.
                 apply (Z.lt_le_trans _ (2 ^ Z.of_nat (Nat.log2_up (sizeL) + 1))); auto.
-                apply Z.pow_le_mono_r, inj_le, plus_le_compat_r; [lia|].
+                apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r; [lia|].
                 apply Nat.log2_up_le_mono; lia.
              ++ rewrite Z2Nat.id; [split|]; auto.
                 unfold lgSize; rewrite sizeSum.
                 apply (Z.lt_le_trans _ (2 ^ Z.of_nat (Nat.log2_up (sizeL) + 1))); auto.
-                apply Z.pow_le_mono_r, inj_le, plus_le_compat_r; [lia|].
+                apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r; [lia|].
                 apply Nat.log2_up_le_mono; lia.
           -- rewrite sizeSum, app_length in e.
              arithmetizeWord; simpl in H5.
@@ -408,7 +408,6 @@ Section Proofs.
                 apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
                 ;[apply log2_up_pow2|].
                 apply Nat.pow_lt_mono_r; lia.
-             ++ specialize (Z_of_nat_pow_2_gt_0 (lgSize + 1)) as P; lia.
              ++ unfold lgSize, size.
                 apply (Nat.le_lt_trans _ sizeL);[lia|].
                 apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)));[apply log2_up_pow2|].
@@ -454,18 +453,12 @@ Section Proofs.
                    specialize (Z_of_nat_pow_2_gt_0 (Nat.log2_up sizeL + 1)) as P
                  | specialize (Z_of_nat_pow_2_gt_0 (lgSize + 1)) as P]; try lia.
              rewrite Z.mod_small in H5, n; [|split|split]; try lia.
-             ++ unfold lgSize, size.
-                rewrite pow2_of_nat, <- Nat2Z.inj_lt.
-                apply (Nat.le_lt_trans _ sizeL); [lia|].
-                apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)))
-                ;[apply log2_up_pow2|].
-                apply Nat.pow_lt_mono_r; lia.
-             ++ unfold lgSize; rewrite sizeSum.
-                rewrite pow2_of_nat, <- Nat2Z.inj_lt.
-                apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
-                apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
-                ;[apply log2_up_pow2|].
-                apply Nat.pow_lt_mono_r; lia.
+             unfold lgSize; rewrite sizeSum.
+             rewrite pow2_of_nat, <- Nat2Z.inj_lt.
+             apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
+             apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
+             ;[apply log2_up_pow2|].
+             apply Nat.pow_lt_mono_r; lia.
     - hyp_consumer.
       goal_consumer2.
     - hyp_consumer.
@@ -488,7 +481,7 @@ Section Proofs.
                 specialize (Word.wordBound _ x0) as P; apply boundProofZ in P; dest; auto.
           -- assert (Nat.log2_up size = Nat.log2_up sizeL) as P.
              { rewrite Nat.nlt_ge in n.
-               destruct (le_lt_or_eq _ _ n); [|unfold size in *; lia].
+               destruct (le_lt_eq_dec _ _ n) as [H0 | H0]; [|unfold size in *; lia].
                exfalso.
                rewrite sizeSum in H0.
                specialize (Nat.log2_up_le_mono sizeL (sizeL + sizeR) ltac:(lia)) as TMP.
@@ -548,7 +541,7 @@ Section Proofs.
              apply Nat.pow_lt_mono_r; lia.
           -- assert (Nat.log2_up size = Nat.log2_up sizeL) as P.
              { rewrite Nat.nlt_ge in n.
-               destruct (le_lt_or_eq _ _ n); [|unfold size in *; lia].
+               destruct (le_lt_eq_dec _ _ n) as [H0 | H0]; [|unfold size in *; lia].
                exfalso.
                rewrite sizeSum in H0.
                specialize (Nat.log2_up_le_mono sizeL (sizeL + sizeR) ltac:(lia)) as TMP.
@@ -599,7 +592,7 @@ Section Proofs.
              apply Nat.pow_lt_mono_r; lia.
           -- assert (Nat.log2_up size = Nat.log2_up sizeL) as P0.
              { rewrite Nat.nlt_ge in n.
-               destruct (le_lt_or_eq _ _ n); [|unfold size in *; lia].
+               destruct (le_lt_eq_dec _ _ n) as [H0 | H0]; [|unfold size in *; lia].
                exfalso.
                rewrite sizeSum in H0.
                specialize (Nat.log2_up_le_mono sizeL (sizeL + sizeR) ltac:(lia)) as TMP.
@@ -712,7 +705,7 @@ Section Proofs.
                 apply zero_lt_pow2.
              ++ rewrite wltu_ge in G0.
                 do 3 rewrite wordToNat_natToWord in G0.
-                ** destruct (le_lt_or_eq _ _ G0); try lia.
+                ** destruct (le_lt_eq_dec _ _ G0) as [H6 | H6]; try lia.
                    rewrite H6 in n; contradiction.
                 ** apply zero_lt_pow2.
                 ** rewrite wordToNat_natToWord; apply zero_lt_pow2.
@@ -816,7 +809,7 @@ Section Proofs.
                 setoid_rewrite sizeSum.
                 unfold size in H6.
                 apply (Z.lt_le_trans _ (2 ^ Z.of_nat (Nat.log2_up sizeL + 1))); auto.
-                apply Z.pow_le_mono_r, inj_le, plus_le_compat_r, Nat.log2_up_le_mono; lia.
+                apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r, Nat.log2_up_le_mono; lia.
              ++ apply neq_wordVal in n.
                 apply eq_word in e; simpl in *.
                 rewrite Z.mod_0_l in n, e; unfold lgSize;
@@ -854,9 +847,6 @@ Section Proofs.
                    apply (Nat.le_lt_trans _ sizeL);[lia|].
                    apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)));[apply log2_up_pow2|].
                    apply Nat.pow_lt_mono_r; lia.
-                ** unfold lgSize; rewrite sizeSum.
-                   specialize (Z_of_nat_pow_2_gt_0 (Nat.log2_up (sizeL + sizeR) + 1)) as P;
-                     lia.
                 ** unfold lgSize, size.
                    apply (Nat.le_lt_trans _ sizeL);[lia|].
                    apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)));[apply log2_up_pow2|].
@@ -997,7 +987,7 @@ Section Proofs.
                            rewrite e, Zmod_0_l, Z.mod_small in G0;
                              [|split; try lia].
                            *** rewrite Nat2Z.id in G0.
-                               destruct (le_lt_or_eq _ _ G0); [lia|].
+                               destruct (le_lt_eq_dec _ _ G0) as [H6 | H6]; [lia|].
                                rewrite H6 in n; simpl in n; contradiction.
                            *** unfold lgSize; rewrite sizeSum.
                                rewrite pow2_of_nat, <- Nat2Z.inj_lt.
@@ -1030,13 +1020,13 @@ Section Proofs.
                                unfold lgSize; rewrite sizeSum.
                                apply (Z.lt_le_trans _ (2 ^ Z.of_nat (Nat.log2_up (sizeL) + 1)));
                                  auto.
-                               apply Z.pow_le_mono_r, inj_le, plus_le_compat_r; [lia|].
+                               apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r; [lia|].
                                apply Nat.log2_up_le_mono; lia.
                            *** rewrite Z2Nat.id; [split|]; auto.
                                unfold lgSize; rewrite sizeSum.
                                apply (Z.lt_le_trans _ (2 ^ Z.of_nat (Nat.log2_up (sizeL) + 1)));
                                  auto.
-                               apply Z.pow_le_mono_r, inj_le, plus_le_compat_r; [lia|].
+                               apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r; [lia|].
                                apply Nat.log2_up_le_mono; lia.
                        +++ rewrite sizeSum, app_length in e.
                            arithmetizeWord; simpl in H13.
@@ -1049,7 +1039,6 @@ Section Proofs.
                                apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
                                ;[apply log2_up_pow2|].
                                apply Nat.pow_lt_mono_r; lia.
-                           *** specialize (Z_of_nat_pow_2_gt_0 (lgSize + 1)) as P; lia.
                            *** unfold lgSize, size.
                                apply (Nat.le_lt_trans _ sizeL);[lia|].
                                apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)));
@@ -1133,7 +1122,7 @@ Section Proofs.
                            dest.
                            rewrite Z2Nat.id; auto.
                            apply (Z.lt_le_trans _ (2 ^ Z.of_nat (Nat.log2_up sizeL + 1))); auto.
-                           apply Z.pow_le_mono_r, inj_le, plus_le_compat_r, Nat.log2_up_le_mono;
+                           apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r, Nat.log2_up_le_mono;
                              lia.
                    --- destruct wltu eqn:G1;
                          [rewrite wltu_lt in G1| rewrite wltu_ge in G1].
@@ -1193,7 +1182,7 @@ Section Proofs.
                            unfold lgSize; setoid_rewrite sizeSum.
                            unfold size.
                            apply (Nat.lt_le_trans _ (2 ^ (Nat.log2_up sizeL + 1))); auto.
-                           apply Nat.pow_le_mono_r, plus_le_compat_r, Nat.log2_up_le_mono
+                           apply Nat.pow_le_mono_r, Nat.add_le_mono_r, Nat.log2_up_le_mono
                            ; lia.
                        +++ unfold lgSize; rewrite sizeSum.
                            apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
@@ -1284,19 +1273,12 @@ Section Proofs.
                                apply eq_word in e; simpl in *.
                                rewrite Zmod_0_l in *; rewrite Z.mod_small in *
                                ; [|split |split]; try lia; unfold lgSize.
-                               ---- rewrite sizeSum.
-                                    rewrite pow2_of_nat, <- Nat2Z.inj_lt.
-                                    apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
-                                    apply (Nat.le_lt_trans _
-                                                           (2 ^ (Nat.log2_up (sizeL + sizeR))));
-                                      [apply log2_up_pow2|].
-                                    apply Nat.pow_lt_mono_r; lia.
-                               ---- unfold size.
-                                    rewrite pow2_of_nat, <- Nat2Z.inj_lt.
-                                    apply (Nat.le_lt_trans _ sizeL); [lia|].
-                                    apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)))
-                                    ;[apply log2_up_pow2|].
-                                    apply Nat.pow_lt_mono_r; lia.
+                               unfold size.
+                               rewrite pow2_of_nat, <- Nat2Z.inj_lt.
+                               apply (Nat.le_lt_trans _ sizeL); [lia|].
+                               apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)))
+                               ;[apply log2_up_pow2|].
+                               apply Nat.pow_lt_mono_r; lia.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2|rewrite wltu_ge in G2]; auto.
                                exfalso.
@@ -1309,18 +1291,12 @@ Section Proofs.
                                apply eq_word in e; simpl in *.
                                rewrite Zmod_0_l in *; rewrite Z.mod_small in *
                                ; [|split |split]; try lia; unfold lgSize.
-                               ---- rewrite sizeSum.
-                                    rewrite pow2_of_nat, <- Nat2Z.inj_lt.
-                                    apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
-                                    apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
-                                    ;[apply log2_up_pow2|].
-                                    apply Nat.pow_lt_mono_r; lia.
-                               ---- unfold size.
-                                    rewrite pow2_of_nat, <- Nat2Z.inj_lt.
-                                    apply (Nat.le_lt_trans _ sizeL); [lia|].
-                                    apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)))
-                                    ;[apply log2_up_pow2|].
-                                    apply Nat.pow_lt_mono_r; lia.
+                               unfold size.
+                               rewrite pow2_of_nat, <- Nat2Z.inj_lt.
+                               apply (Nat.le_lt_trans _ sizeL); [lia|].
+                               apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)))
+                               ;[apply log2_up_pow2|].
+                               apply Nat.pow_lt_mono_r; lia.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2
                                  |rewrite wltu_ge in G2; rewrite snoc_rapp, app_length;
@@ -1350,7 +1326,7 @@ Section Proofs.
                            unfold lgSize; setoid_rewrite sizeSum.
                            unfold size.
                            apply (Nat.lt_le_trans _ (2 ^ (Nat.log2_up sizeL + 1))); auto.
-                           apply Nat.pow_le_mono_r, plus_le_compat_r, Nat.log2_up_le_mono
+                           apply Nat.pow_le_mono_r, Nat.add_le_mono_r, Nat.log2_up_le_mono
                            ; lia.
                        +++ unfold lgSize; rewrite sizeSum.
                            apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
@@ -1384,12 +1360,6 @@ Section Proofs.
                                     apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
                                     ;[apply log2_up_pow2|].
                                     apply Nat.pow_lt_mono_r; lia.
-                               ---- unfold lgSize, size.
-                                    specialize (Z_of_nat_pow_2_gt_0 ((Nat.log2_up sizeL + 1)))
-                                      as P; lia.
-                               ---- unfold lgSize; rewrite sizeSum.
-                                    specialize (Z_of_nat_pow_2_gt_0
-                                                  ((Nat.log2_up (sizeL + sizeR) + 1))) as P; lia.
                                ---- unfold lgSize; rewrite sizeSum.
                                     apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
                                     apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
@@ -1431,12 +1401,6 @@ Section Proofs.
                                     apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))
                                     ;[apply log2_up_pow2|].
                                     apply Nat.pow_lt_mono_r; lia.
-                               ---- unfold lgSize, size.
-                                    specialize (Z_of_nat_pow_2_gt_0 ((Nat.log2_up sizeL + 1)))
-                                      as P; lia.
-                               ---- unfold lgSize; rewrite sizeSum.
-                                    specialize (Z_of_nat_pow_2_gt_0
-                                                  ((Nat.log2_up (sizeL + sizeR) + 1))) as P; lia.
                                ---- unfold lgSize; rewrite sizeSum.
                                     apply (Nat.le_lt_trans _ (sizeL + sizeR)); [lia|].
                                     apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up (sizeL + sizeR))))

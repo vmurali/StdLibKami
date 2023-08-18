@@ -198,7 +198,7 @@ Section Proofs.
                         (Z.to_nat ((wordVal (lgSize + 1) x1
                                     - wordVal (lgSize + 1) x) mod 2 ^ Z.of_nat (lgSize + 1))))
             as P1.
-          destruct (le_lt_or_eq _ _ P1); auto.
+          destruct (le_lt_eq_dec _ _ P1) as [H0 | H0]; auto.
           exfalso.
           apply neq_wordVal in n; apply n.
           specialize (wordBound _ x) as P2; specialize (wordBound _ x1) as P3.
@@ -245,6 +245,7 @@ Section Proofs.
           [|simpl in *; rewrite rotateLength, <- list_arr_length; lia].
         arithmetizeWord; destruct x, x1; simpl in *.
         rewrite Zminus_mod_idemp_l.
+        assert (liaProof: (0 < Z.of_nat size * 2)%Z) by lia.
         rewrite (Z.mod_small
                    (Z.of_nat size - (wordVal0 - wordVal) mod 2 ^ Z.of_nat (lgSize + 1))
                    (2 ^ Z.of_nat (lgSize + 1))).
@@ -254,14 +255,14 @@ Section Proofs.
                           (2 ^ Z.of_nat (lgSize + 1))) at 1; auto; split; try lia.
             unfold lgSize in *.
             rewrite <- Zpow_of_nat, Nat.pow_add_r, pow2, Nat2Z.inj_mul in *; simpl in *.
-            specialize (Z.mod_pos_bound (wordVal0 - wordVal) (Z.of_nat size * 2) ltac:(lia))
+            specialize (Z.mod_pos_bound (wordVal0 - wordVal) (Z.of_nat size * 2) liaProof)
               as TMP; lia.
           * apply Z.mod_pos_bound.
             unfold lgSize in *.
             rewrite <- Zpow_of_nat, Nat.pow_add_r, pow2, Nat2Z.inj_mul in *; simpl in *; lia.
         + unfold lgSize in *.
           rewrite <- Zpow_of_nat, Nat.pow_add_r, pow2, Nat2Z.inj_mul in *; simpl in *; try lia.
-          specialize (Z.mod_pos_bound (wordVal0 - wordVal) (Z.of_nat size * 2) ltac:(lia)) as P1;
+          specialize (Z.mod_pos_bound (wordVal0 - wordVal) (Z.of_nat size * 2) liaProof) as P1;
             lia.
       - hyp_consumer.
         goal_consumer2; eauto.
@@ -277,7 +278,7 @@ Section Proofs.
                           (Z.to_nat ((wordVal (lgSize + 1) x10
                                      - wordVal (lgSize + 1) x6)
                                        mod 2 ^ Z.of_nat (lgSize + 1)))) as P1.
-            destruct (le_lt_or_eq _ _ P1); auto.
+            destruct (le_lt_eq_dec _ _ P1) as [H1 | H1]; auto.
             exfalso.
             specialize (wordBound _ x6) as P2; specialize (wordBound _ x10) as P3.
             rewrite boundProofZIff in *.
@@ -315,10 +316,11 @@ Section Proofs.
                unfold lgSize in *.
                rewrite <- Zpow_of_nat, pow2 in *.
                apply n0.
+               assert (liaProof2: (0 < Z.of_nat size)%Z) by lia.
                specialize (Z.mod_pos_bound
                              (wordVal (Nat.log2_up size + 1) x6)
                              (Z.of_nat size)
-                             ltac:(lia)) as P1; lia.
+                             liaProof2) as P1; lia.
       - hyp_consumer.
         goal_consumer2.
       - hyp_consumer.
@@ -336,7 +338,7 @@ Section Proofs.
                                          - wordVal (lgSize + 1) x13)
                                           mod 2 ^ Z.of_nat (lgSize + 1))))
                  as P1.
-               destruct (le_lt_or_eq _ _ P1); auto.
+               destruct (le_lt_eq_dec _ _ P1) as [H1 | H1]; auto.
                exfalso.
                apply neq_wordVal in n; apply n.
                specialize (wordBound _ x13) as P2; specialize (wordBound _ x19) as P3.
@@ -377,10 +379,11 @@ Section Proofs.
                   unfold lgSize in *.
                   rewrite <- Zpow_of_nat, pow2 in *.
                   apply n0.
+                  assert (liaProof2: (0 < Z.of_nat size)%Z) by lia.
                   specialize (Z.mod_pos_bound
                                 (wordVal (Nat.log2_up size + 1) x13)
                                 (Z.of_nat size)
-                                ltac:(lia)) as P1; lia.
+                                liaProof2) as P1; lia.
         + econstructor 1; auto; normalize_key_concl; simpl.
           * destruct weq; simpl.
             -- simpl in Hbound0.
@@ -525,7 +528,7 @@ Section Proofs.
                      rewrite Fin_eqb_neq in G0.
                      apply G0.
                      arithmetizeWord; destruct x10; simpl in *.
-                     rewrite <- Zpow_of_nat, <- mod_Zmod, <- (Z2Nat.id (wordVal mod _)) in H4
+                     rewrite <- Zpow_of_nat, <- Nat2Z.inj_mod, <- (Z2Nat.id (wordVal mod _)) in H4
                      ; try lia.
                      apply Nat2Z.inj in H4.
                      rewrite Zmod_mod', Nat2Z.id in H4; try lia.
@@ -572,7 +575,7 @@ Section Proofs.
             { rewrite <- e; simpl.
               unfold lgSize in *.
               rewrite Zplus_mod_idemp_l, Zplus_mod_idemp_r, Zminus_mod_idemp_l, Z.add_simpl_l,
-              <- Zpow_of_nat, Nat.pow_add_r, Nat.pow_1_r, pow2, <- mod_Zmod, Nat.mod_small; lia.
+              <- Zpow_of_nat, Nat.pow_add_r, Nat.pow_1_r, pow2, <- Nat2Z.inj_mod, Nat.mod_small; lia.
             }
             econstructor 1; auto; normalize_key_concl; simpl; try lia.
             repeat f_equal.

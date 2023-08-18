@@ -1,6 +1,7 @@
 Require Import Kami.AllNotations StdLibKami.RegStruct.
 Require Import Kami.Utila.
 Require Import List.
+Require Import Psatz.
 Import ListNotations.
 
 Section Granule.
@@ -26,21 +27,21 @@ Section Granule.
   Lemma divCeil_ge x y: y <> 0 -> divCeil x y * y >= x.
   Proof.
     intros.
-    pose proof (Nat.div_mod (x + (y-1)) y ltac:(Omega.omega)) as sth.
+    pose proof (Nat.div_mod (x + (y-1)) y ltac:(lia)) as sth.
     rewrite Nat.mul_comm in sth.
     pose proof (Nat.mod_le (x + (y-1)) _ H) as sth2. 
-    assert (sth3: divCeil x y * y = x + (y-1) - ((x + (y-1))mod y)) by Omega.omega.
+    assert (sth3: divCeil x y * y = x + (y-1) - ((x + (y-1))mod y)) by lia.
     Opaque Nat.div.
     simpl.
     rewrite sth3.
     Transparent Nat.div.
-    pose proof (Nat.mod_bound_pos (x + (y-1)) y ltac:(Omega.omega) ltac:(Omega.omega)).
-    Omega.omega.
+    pose proof (Nat.mod_bound_pos (x + (y-1)) y ltac:(lia) ltac:(lia)).
+    lia.
   Qed.
 
   Definition byteAlign ty k (e: k @# ty): (Bit (div_packn k * n) @# ty).
     refine (castBits _ (ZeroExtend (div_packn k * n - size k) (pack e))).
-    abstract (pose proof (@divCeil_ge (size k) n (pow2_ne_zero _)); Omega.omega).
+    abstract (pose proof (@divCeil_ge (size k) n (pow2_ne_zero _)); lia).
   Defined.
 
   Section RegMapper.
@@ -149,7 +150,7 @@ Section Granule.
                                       (div_packn k * n)
                                       (getFinishPacket addr k maskSz * dataSz - getFinishGranule addr k * n)
                                       (castBits _ (pack e)))))).
-      abstract (pose proof (@divCeil_ge (size k) n (pow2_ne_zero _)); Omega.omega).
+      abstract (pose proof (@divCeil_ge (size k) n (pow2_ne_zero _)); lia).
       Opaque Nat.div.
       abstract (
           simpl;
@@ -447,9 +448,9 @@ End Granule.
   (* Lemma helper_pow2_packn k: (pow2_packn k * n >= size k)%nat. *)
   (* Proof. *)
   (*   remember (size k) as x; clear Heqx. *)
-  (*   pose proof (@divCeil_ge x n ltac:(Omega.omega)) as sth. *)
+  (*   pose proof (@divCeil_ge x n ltac:(lia)) as sth. *)
   (*   pose proof (log2_up_pow2 (divCeil x n)). *)
-  (*   Omega.omega. *)
+  (*   lia. *)
   (* Qed. *)
 
   (* Fixpoint wordSplitter' n t: word (t * n) -> list (word n) := *)
@@ -462,7 +463,7 @@ End Granule.
   (*   refine *)
   (*     (wordSplitter' n (divCeil sz n) (nat_cast word _ ({< natToWord (divCeil sz n * n - sz) 0, w>})%word)). *)
   (*   abstract (pose proof (divCeil_ge sz pf); *)
-  (*             Omega.omega). *)
+  (*             lia). *)
   (* Defined. *)
 
   (* Fixpoint exprSplitter' ty n t: (Bit (t * n) @# ty) -> list (Bit n @# ty) := *)
@@ -475,7 +476,7 @@ End Granule.
   (*   refine *)
   (*     (exprSplitter' n (divCeil sz n) (castBits _ ({< Const ty (natToWord (divCeil sz n * n - sz) 0), w>})%kami_expr)). *)
   (*   abstract (pose proof (divCeil_ge sz pf); *)
-  (*             Omega.omega). *)
+  (*             lia). *)
   (* Defined. *)
 
   (* Fixpoint convertBoolsToWord ls: word (length ls) := *)
@@ -486,7 +487,7 @@ End Granule.
 
   (* Definition byteAlignMask k: word (div_packn k * n). *)
   (*   refine (nat_cast word _ (combine (wones (size k)) (natToWord (div_packn k * n - size k) 0))). *)
-  (*   abstract (pose proof (@divCeil_ge (size k) n ltac:(Omega.omega)); Omega.omega). *)
+  (*   abstract (pose proof (@divCeil_ge (size k) n ltac:(lia)); lia). *)
   (* Defined. *)
 
   (* Definition putRightPositionWord n (w: word n) start finish := *)
@@ -494,9 +495,9 @@ End Granule.
 
 
 
-  (* Eval compute in (map (@evalExpr _) (@exprSplitter type 3 ltac:(Omega.omega) 4 (Const type WO~0~1~0~1))). *)
-  (* Eval compute in (map (@evalExpr _) (@exprSplitter type 3 ltac:(Omega.omega) _ (Const type WO~1~1~0~1~1~0~1~0))). *)
-  (* Eval compute in ((@wordSplitter 3 ltac:(Omega.omega) _ (WO~1~1~0~1~1~0~1~0))). *)
+  (* Eval compute in (map (@evalExpr _) (@exprSplitter type 3 ltac:(lia) 4 (Const type WO~0~1~0~1))). *)
+  (* Eval compute in (map (@evalExpr _) (@exprSplitter type 3 ltac:(lia) _ (Const type WO~1~1~0~1~1~0~1~0))). *)
+  (* Eval compute in ((@wordSplitter 3 ltac:(lia) _ (WO~1~1~0~1~1~0~1~0))). *)
 
   (* Goal True. *)
   (*   pose (evalExpr (putRightPosition (Const type (WO~1~1~1)%word) 4 16)). *)
