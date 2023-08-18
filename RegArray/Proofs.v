@@ -220,27 +220,27 @@ Proof.
   unfold sparseList, nth_default.
   destruct (nth_error l _) eqn:G.
   - induction size; [lia|].
-    apply lt_n_Sm_le in H.
-    destruct (le_lt_or_eq _ _ H).
+    apply -> Nat.lt_succ_r in H.
+    destruct (le_lt_eq_dec _ _ H).
     + rewrite seq_eq, map_app, nth_error_app1.
       * apply IHsize; assumption.
       * rewrite map_length, seq_length; assumption.
     + rewrite seq_eq, map_app, nth_error_app2.
-      * rewrite map_length, seq_length, plus_O_n, H0, diag; simpl.
+      * rewrite map_length, seq_length, plus_O_n, e, diag; simpl.
         rewrite Nat.eqb_refl; reflexivity.
       * rewrite map_length, seq_length; lia.
   - induction size; [lia|].
-    apply lt_n_Sm_le in H.
-    destruct (le_lt_or_eq _ _ H).
+    apply -> Nat.lt_succ_r in H.
+    destruct (le_lt_eq_dec _ _ H).
     + rewrite seq_eq, map_app, nth_error_app1.
       * apply IHsize; assumption.
       * rewrite map_length, seq_length; assumption.
     + rewrite seq_eq, map_app, nth_error_app2.
-      * rewrite map_length, seq_length, plus_O_n, H0, diag; simpl.
+      * rewrite map_length, seq_length, plus_O_n, e, diag; simpl.
         rewrite Nat.eqb_refl; reflexivity.
       * rewrite map_length, seq_length; lia.
 Qed.
-      
+
 Lemma sparse_size_le {A : Type} (l : list A):
   forall def n size,
     size <= n ->
@@ -270,17 +270,17 @@ Proof.
   induction size; intros; [lia|].
   unfold sparseList.
   rewrite seq_eq, map_app.
-  apply lt_n_Sm_le in H; apply lt_n_Sm_le in H0.
-  destruct (le_lt_or_eq _ _ H), (le_lt_or_eq _ _ H0).
+  apply -> Nat.lt_succ_r in H; apply -> Nat.lt_succ_r in H0.
+  destruct (le_lt_eq_dec _ _ H), (le_lt_eq_dec _ _ H0).
   - rewrite nth_error_app1.
     + apply IHsize; auto.
     + rewrite map_length, seq_length; assumption.
   - rewrite nth_error_app2.
-    + rewrite map_length, seq_length, H3, diag; simpl.
+    + rewrite map_length, seq_length, e, diag; simpl.
       destruct Nat.eqb eqn:G; auto.
       exfalso.
       rewrite Nat.eqb_eq in G.
-      apply H1; rewrite H3; assumption.
+      apply H1; rewrite e; assumption.
     + rewrite map_length, seq_length; lia.
   - rewrite nth_error_app1.
     specialize (sparse_size_le l def (Nat.le_refl size)) as P.
@@ -292,7 +292,7 @@ Proof.
       rewrite Nat.eqb_eq in G; lia.
     + rewrite map_length, seq_length; assumption.
   - exfalso.
-    apply H1; rewrite H2; assumption.
+    subst; auto.
 Qed.
 
 Lemma length_sparseList {A : Type} (def : A) (l : list A) (n size : nat) :
@@ -331,7 +331,8 @@ Proof.
   intros.
   unfold sparseList', sparseList, nth_default, defList.
   rewrite nth_error_app1; auto.
-  rewrite <- (le_plus_minus_r (length l1) size) at 1.
+  assert (sth: Datatypes.length l1 + (size - Datatypes.length l1) = size) by (rewrite app_length in H; lia).
+  rewrite <- sth at 1.
   - rewrite seq_app, map_app.
     f_equal; simpl.
     rewrite <- (diag (length l1)), <- Reduce_seq, map_map; auto.
@@ -340,7 +341,6 @@ Proof.
     destruct Nat.eqb eqn:G; auto.
     exfalso.
     rewrite Nat.eqb_eq in G; subst; lia.
-  - rewrite app_length in H; lia.
 Qed.
 
 Lemma sparseList_app2 {A : Type} (def : A) :
@@ -354,7 +354,8 @@ Proof.
   intros.
   unfold sparseList, nth_default, defList'.
   rewrite <- nth_error_app2; auto.
-  rewrite <- (le_plus_minus_r (length l1) size) at 1.
+  assert (sth: Datatypes.length l1 + (size - Datatypes.length l1) = size) by (rewrite app_length in H; lia).
+  rewrite <- sth at 1.
   - rewrite seq_app, map_app.
     f_equal.
     + apply map_ext_in; intros.
@@ -376,7 +377,6 @@ Proof.
         rewrite Nat.eqb_eq in G0.
         apply G.
         lia.
-  - rewrite app_length in H; lia.
 Qed.
 
 Lemma sparseList'_app1 {A : Type} (def : A) :
@@ -387,7 +387,7 @@ Proof.
   intros.
   specialize (@sparseList_app1 _ def l1 l2 m (length (l1 ++ l2)) ltac:(auto) ltac:(auto)) as P.
   unfold sparseList', defList', defList in *.
-  rewrite app_length, minus_plus in *.
+  rewrite app_length, Nat.add_comm, Nat.add_sub in *.
   assumption.
 Qed.
 
@@ -399,7 +399,7 @@ Proof.
   intros.
   specialize (@sparseList_app2 _ def l1 l2 m (length (l1 ++ l2)) ltac:(auto) ltac:(auto)) as P.
   unfold sparseList', defList' in *.
-  rewrite app_length, minus_plus in *.
+  rewrite app_length, Nat.add_comm, Nat.add_sub in *.
   assumption.
 Qed.
 
@@ -592,8 +592,8 @@ Proof.
       * constructor.
       * unfold tag in *.
         rewrite Nat.lt_succ_r in idxBound.
-        apply le_lt_or_eq in idxBound.
-        destruct idxBound.
+        apply le_lt_eq_dec in idxBound.
+        destruct idxBound as [H0 | H0].
         -- unfold sparseList in *.
           rewrite seq_eq, map_app, tagApp; repeat rewrite map_app.
           apply Forall2_app.
@@ -1390,7 +1390,7 @@ Section Proofs.
              exfalso.
              specialize (fin_to_nat_bound x) as P1.
              rewrite e, wordToNat_natToWord_eqn, Nat.mod_small in l; try lia.
-             apply (lt_le_trans _ size); auto.
+             apply (Nat.lt_le_trans _ size); auto.
              apply log2_up_pow2.
         * do 2 eexists; econstructor 1 with (arrayVal := (fun i =>
                                               if getBool (weq (val F1) $ (proj1_sig (to_nat i)))
@@ -1419,7 +1419,7 @@ Section Proofs.
                        rewrite e, to_nat_of_nat, wordToNat_natToWord_eqn, Nat.mod_small in H;
                          [simpl in H; lia|].
                        simpl.
-                       apply (lt_le_trans _ size); auto.
+                       apply (Nat.lt_le_trans _ size); auto.
                        apply log2_up_pow2.
                    --- rewrite map_map; simpl.
                        apply NoDup_f.
@@ -1499,7 +1499,7 @@ Section Proofs.
                            rewrite e, in_seq in H.
                            simpl in H; destruct H.
                            rewrite wordToNat_natToWord_eqn, Nat.mod_small in H; [lia|].
-                           apply (lt_le_trans _ size); auto.
+                           apply (Nat.lt_le_trans _ size); auto.
                            apply log2_up_pow2.
                        +++ intro; repeat rewrite map_map; cbn [map fst].
                            destruct (in_dec string_dec k
