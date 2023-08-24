@@ -26,8 +26,13 @@ Section Impl.
 
   Context (fifo: @Fifo.Ifc.Ifc fifoParams).
 
+  (* The register that assembles as full Inst from two CompInsts *)
   Local Definition topRegName := (Fetcher.Ifc.name ++ ".topReg")%string.
+
+  (* Number of requests sent to memory *)
   Local Definition outstandingName := (Fetcher.Ifc.name ++ ".outstanding")%string.
+  
+  (* Number of responses from memory that have to be cleared *)
   Local Definition clearOutstandingName := (Fetcher.Ifc.name ++ ".clearOutstanding")%string.
 
   Local Open Scope kami_expr.
@@ -69,7 +74,7 @@ Section Impl.
     Read top: TopEntry <- topRegName;
     LETA ftop: Maybe InRes <- @Fifo.Ifc.first _ fifo _;
     LETA notComplete <- isNotComplete #top #ftop;
-    If #notComplete && #ftop @% "valid" && !(isNextAddr (#top @% "vaddr" + $1) (#ftop @% "data" @% "vaddr"))
+    If #notComplete && #ftop @% "valid" && !(isNextAddr (#top @% "vaddr") (#ftop @% "data" @% "vaddr"))
     then @Fifo.Ifc.deq _ fifo _;
     Retv.
 
@@ -96,6 +101,7 @@ Section Impl.
       Retv );
     Retv.
 
+  (* Invoked once memory sends back response *)
   Local Definition callback ty (res: ty InRes): ActionT ty Void :=
     Read clearOutstanding: Bit (lgSize + 1) <- clearOutstandingName;
     If #clearOutstanding == $0
@@ -105,6 +111,7 @@ Section Impl.
     Write outstandingName <- #outstanding - $1;
     Retv.
 
+  (* Invoked to send request to memory. The Bool returned by sendReq denotes whether the request was accepted *)
   Local Definition sendAddr (sendReq : forall ty, ty OutReq -> ActionT ty Bool) ty (req: ty OutReq) :=
     LETA retval <- sendReq _ req;
     Read outstanding: Bit ((Nat.log2_up size) + 1) <- outstandingName;

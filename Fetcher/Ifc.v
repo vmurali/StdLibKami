@@ -32,7 +32,7 @@ Section Ifc.
          "inst"   :: Inst
        }.
 
-  (* if inst contains a compressed instruction the upper 16 bit contain arbitrary data. *)
+  (* if inst contains a compressed instruction the upper 16 bits contain arbitrary data. *)
   Definition OutRes
     := STRUCT_TYPE {
          "notComplete?" :: Bool;
@@ -41,7 +41,7 @@ Section Ifc.
          "error"        :: finalErrK;
          "compressed?"  :: Bool;
          "errUpper?"    :: Bool;
-         "inst"         :: Inst 
+         "inst"         :: Inst
        }.
 
   Record Ifc: Type :=
