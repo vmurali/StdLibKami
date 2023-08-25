@@ -7,13 +7,15 @@ Section Impl.
       
   Local Definition ShortVAddr := Bit (vAddrSz - 2).
 
+  (* Instruction requests are always made at InstSz granularity *)
   Local Definition TopEntry: Kind
     := STRUCT_TYPE {
-         "vaddr"  :: ShortVAddr;
-         "immRes" :: immResK;
-         "error"  :: finalErrK;
-         "upper"  :: Maybe CompInst;
-         "lower"  :: Maybe CompInst
+         "vaddr"  :: ShortVAddr; (* If lower is valid, then actual vaddr = shortVAddr >> 2; otherwise if only upper is valid, vaddr = (shortVaddr >> 2) + 2*)
+         "immRes" :: immResK; (* Immediate response from memory *)
+         "error"  :: finalErrK; (* Final error response from memory *)
+         "upper"  :: Maybe CompInst; (* If lower is invalid, this contains either a full compressed inst or just the LSB portion of the next incomplete inst.
+                                        If lower is valid, then it contains the MSB portion of an uncompressed inst *)
+         "lower"  :: Maybe CompInst (* Always contains the LSB portion of an inst - either compressed or normal *)
        }.
 
   Local Instance fifoParams
@@ -45,6 +47,7 @@ Section Impl.
     LETA numFree <- Fifo.Ifc.numFree fifo;
     Ret (#numFree <= #outstanding).
 
+  (* Only if true can the outstanding requests be cleared *)
   Local Definition canClear ty: ActionT ty Bool :=
     Read clearOutstanding: Bit (lgSize + 1) <- clearOutstandingName;
     Ret (#clearOutstanding == $0).
@@ -70,6 +73,7 @@ Section Impl.
          && !(isCompressed (top @% "upper" @% "data"))
          && !((ftop @%"valid") && isNextAddr (top @% "vaddr") (ftop @% "data" @% "vaddr"))).
 
+  (* If ftop doesn't complete the current upper in top, then drop ftop *)
   Local Definition notCompleteDeqRule ty: ActionT ty Void :=
     Read top: TopEntry <- topRegName;
     LETA ftop: Maybe InRes <- @Fifo.Ifc.first _ fifo _;
@@ -151,12 +155,6 @@ Section Impl.
 
     LET straddle: Bool <- isStraddle #top;
     
-    LET upperOnly: Bool <- (IF #top @% "lower" @% "valid"
-                            then $$ false
-                            else (IF #upperTopCompressed
-                                  then $$ true
-                                  else $$ false));
-    
     LET pickFifo: Bool <- (IF #straddle
                            then !(isImmErr (#top @% "immRes") || (isFinalErr (#top @% "error")))
                            else $$false);
@@ -183,7 +181,7 @@ Section Impl.
        (#top @% "lower" @% "valid" && !isCompressed (#top @% "lower" @% "data")) ||
        (!(#top @% "lower" @% "valid") && !#notComplete));
 
-    LET newLowerValid <- #ftopM @% "valid" && (isAligned (#ftop @% "vaddr")) && !(isStraddle #top);
+    LET newLowerValid <- #ftopM @% "valid" && (* (isAligned (#ftop @% "vaddr")) && *) !(isStraddle #top);
 
     LET newTopRegDeq: TopEntry <- STRUCT { "vaddr"  ::= ZeroExtendTruncMsb (vAddrSz - 2) (#ftop @% "vaddr");
                                            "immRes" ::= #ftop @% "immRes";
