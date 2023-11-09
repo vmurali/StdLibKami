@@ -243,6 +243,8 @@ Section Proofs.
       - hyp_consumer.
         goal_consumer1; simpl; unfold listInSpec; rewrite firstn_length_le;
           [|simpl in *; rewrite rotateLength, <- list_arr_length; lia].
+        rewrite ?wzero_wplus.
+        rewrite <- ?wsub_as_wnot.
         arithmetizeWord; destruct x, x1; simpl in *.
         rewrite Zminus_mod_idemp_l.
         assert (liaProof: (0 < Z.of_nat size * 2)%Z) by lia.
