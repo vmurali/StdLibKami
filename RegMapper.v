@@ -282,7 +282,7 @@ Section Granule.
         mgr_name : string
       }.
 
-    Definition MayStruct_Struct n (x: MayStruct n) := Struct (fun i => projT1 (vals x i)) (names x).
+    Definition MayStruct_Struct n (x: MayStruct n) := Struct (fun i => (names x i, projT1 (vals x i))).
 
 
     Definition MayGroupReg_Gen (x: MayGroupReg) := {| srg_addr  := mgr_addr x ;
@@ -296,7 +296,7 @@ Section Granule.
 
     Definition mayStructKind (n : nat) (x : MayStruct n)
       :  Kind
-      := Struct (fun i : Fin.t n => projT1 (vals x i)) (names x).
+      := Struct (fun i : Fin.t n => (names x i, projT1 (vals x i))).
 
     Variable ContextCodeWidth : nat.
     Definition ContextCodeT := Bit ContextCodeWidth.
