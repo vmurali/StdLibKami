@@ -313,7 +313,7 @@ Section Proofs.
                destruct (firstn _ _); [discriminate|].
                inv P3; simpl.
                f_equal.
-               apply of_nat_ext.
+               apply Fin.of_nat_ext.
             -- exfalso.
                unfold lgSize in *.
                rewrite <- Zpow_of_nat, pow2 in *.
@@ -376,7 +376,7 @@ Section Proofs.
                   destruct (firstn _ _); [discriminate|].
                   inv P3; simpl.
                   f_equal.
-                  apply of_nat_ext.
+                  apply Fin.of_nat_ext.
                ++ exfalso.
                   unfold lgSize in *.
                   rewrite <- Zpow_of_nat, pow2 in *.
@@ -517,10 +517,10 @@ Section Proofs.
                   repeat f_equal.
                   apply functional_extensionality; intro.
                   apply if_bool_2.
-                  destruct eqb eqn:G0, weq; auto.
+                  destruct Fin.eqb eqn:G0, weq; auto.
                   ** exfalso.
                      apply n0.
-                     rewrite eqb_eq in G0; rewrite G0, to_nat_of_nat; simpl.
+                     rewrite Fin.eqb_eq in G0; rewrite G0, Fin.to_nat_of_nat; simpl.
                      arithmetizeWord.
                      destruct x10; simpl.
                      rewrite Z2Nat.id, Zmod_mod; auto.
@@ -535,8 +535,8 @@ Section Proofs.
                      apply Nat2Z.inj in H4.
                      rewrite Zmod_mod', Nat2Z.id in H4; try lia.
                      rewrite (Nat.mod_small (proj1_sig _)) in H4.
-                     --- apply to_nat_inj.
-                         rewrite <- H4, to_nat_of_nat; simpl.
+                     --- apply Fin.to_nat_inj.
+                         rewrite <- H4, Fin.to_nat_of_nat; simpl.
                          rewrite <- (Nat2Z.id (2 ^ _)), <- Zmod_mod', Zpow_of_nat; try lia.
                      --- rewrite pow2.
                          apply fin_to_nat_bound.

@@ -148,7 +148,7 @@ Section Proofs.
                                             STRUCT {"valid" ::= Const type true;
                                                     "data" ::= Spec.getHead type
                                                     implRegValL}%kami_expr
-                                        else evalConstT Default) (FS F1)) implRegValR
+                                        else evalConstT Default) (Fin.FS Fin.F1)) implRegValR
                                  else implRegValR))).
         instantiate (1 := (if wltu lenValL
                     $ (sizeL - length

@@ -176,14 +176,14 @@ Local Definition impl_write k size size' (writeRq : type (WriteRq (Nat.log2_up s
                   Read val : k <- reg;
                   Write reg : k <-
                   IF Const type $ (i)%word ==
-                     ReadStruct (Var _ (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq) F1
+                     ReadStruct (Var _ (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq) Fin.F1
                   then ReadStruct (Var _ (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq)
-                                  (FS F1)
+                                  (Fin.FS Fin.F1)
                   else Var type _ val; Retv)
                  (tag (map f (seq O size))) as vals; Retv)%kami_action.
 
 Lemma MaybeReadevalCorrect k :
-  forall (x y : Expr type (SyntaxKind (Maybe k))) (i : t 2),
+  forall (x y : Expr type (SyntaxKind (Maybe k))) (i : Fin.t 2),
          evalExpr x = evalExpr y ->
          evalExpr (ReadStruct x i) = evalExpr (ReadStruct y i).
 Proof.
@@ -929,8 +929,8 @@ Lemma impl_write_reduction k (l : list (type k)):
   forall (f : nat -> string) size size' (writeRq : type (WriteRq (Nat.log2_up size') k)),
     size <= size' ->
     size <= length l ->
-    let idx := wordToNat (writeRq F1) in
-    let val := writeRq (FS F1) in
+    let idx := wordToNat (writeRq Fin.F1) in
+    let val := writeRq (Fin.FS Fin.F1) in
     (forall n m, f n = f m -> n = m) ->
     forall reads upds calls retV,
       SemAction (valsToRegs k f (rev l))
@@ -984,7 +984,7 @@ Proof.
            destruct weq; auto.
            exfalso.
            rewrite map_length, seq_length, Nat.add_0_r in e.
-           assert (@wordToNat (Nat.log2_up size') ($ size) = wordToNat (writeRq F1)) as P.
+           assert (@wordToNat (Nat.log2_up size') ($ size) = wordToNat (writeRq Fin.F1)) as P.
            { rewrite e; reflexivity. }
            rewrite wordToNat_natToWord_eqn, Nat.mod_small in P.
            ++ rewrite P in l0.
@@ -1026,8 +1026,8 @@ Proof.
                        Write reg : k <-
                        IF Const type $ (i)%word ==
                           ReadStruct (Var _ (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq)
-                                     F1
-         then ReadStruct (Var type (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq) (FS F1)
+                                     Fin.F1
+         then ReadStruct (Var type (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq) (Fin.FS Fin.F1)
          else Var type (SyntaxKind k) val; Retv)%kami_action) (tagFrom 0 (map f (seq 0 n))))
                 (map
        (fun x =>
@@ -1054,7 +1054,7 @@ Proof.
               rewrite (H1 _ _ H0) in *.
               destruct weq; simpl; auto.
               exfalso.
-              assert (@wordToNat (Nat.log2_up size') ($ n) = wordToNat (writeRq F1)) as P.
+              assert (@wordToNat (Nat.log2_up size') ($ n) = wordToNat (writeRq Fin.F1)) as P.
               { rewrite e; reflexivity. }
               rewrite wordToNat_natToWord_eqn, Nat.mod_small in P.
               ** unfold idx in H.
@@ -1087,8 +1087,8 @@ Proof.
                        Write reg : k <-
                        IF Const type $ (i)%word ==
                           ReadStruct (Var _ (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq)
-                                     F1
-         then ReadStruct (Var type (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq) (FS F1)
+                                     Fin.F1
+         then ReadStruct (Var type (SyntaxKind (WriteRq (Nat.log2_up size') k)) writeRq) (Fin.FS Fin.F1)
          else Var type (SyntaxKind k) val; Retv)%kami_action)
                    (tagFrom n (map f (seq n m))))
                 (map
@@ -1117,7 +1117,7 @@ Proof.
            destruct weq; simpl; auto.
            exfalso.
            rewrite map_length, seq_length in e.
-           assert (@wordToNat (Nat.log2_up size') $ (m + n) = wordToNat (writeRq F1)) as P.
+           assert (@wordToNat (Nat.log2_up size') $ (m + n) = wordToNat (writeRq Fin.F1)) as P.
               { rewrite e; reflexivity. }
               rewrite wordToNat_natToWord_eqn, Nat.mod_small in P.
               ** unfold idx in H2.
@@ -1361,7 +1361,7 @@ Section Proofs.
       do 2 eexists; split.
       + repeat econstructor.
         * repeat intro; inv H.
-      + destruct (le_lt_dec size (wordToNat (val F1))).
+      + destruct (le_lt_dec size (wordToNat (val Fin.F1))).
         * do 2 eexists.
           econstructor 1 with (arrayVal := arrayVal).
           -- reflexivity.
@@ -1393,8 +1393,8 @@ Section Proofs.
              apply (Nat.lt_le_trans _ size); auto.
              apply log2_up_pow2.
         * do 2 eexists; econstructor 1 with (arrayVal := (fun i =>
-                                              if getBool (weq (val F1) $ (proj1_sig (to_nat i)))
-                                              then val (FS F1)
+                                              if getBool (weq (val Fin.F1) $ (proj1_sig (Fin.to_nat i)))
+                                              then val (Fin.FS Fin.F1)
                                               else arrayVal i)).
           -- reflexivity.
           -- unfold valsToRegs, f.
@@ -1416,7 +1416,7 @@ Section Proofs.
                        destruct lt_dec; auto.
                        destruct weq; auto.
                        exfalso.
-                       rewrite e, to_nat_of_nat, wordToNat_natToWord_eqn, Nat.mod_small in H;
+                       rewrite e, Fin.to_nat_of_nat, wordToNat_natToWord_eqn, Nat.mod_small in H;
                          [simpl in H; lia|].
                        simpl.
                        apply (Nat.lt_le_trans _ size); auto.
@@ -1425,7 +1425,7 @@ Section Proofs.
                        apply NoDup_f.
                ** repeat intro; rewrite map_map; simpl.
                   destruct (string_dec
-                              (name ++ String "_" (natToHexStr (wordToNat (val F1)))) k).
+                              (name ++ String "_" (natToHexStr (wordToNat (val Fin.F1)))) k).
                   --- right; intro.
                       rewrite in_map_iff in H; dest.
                       rewrite <- H in e.
@@ -1437,7 +1437,7 @@ Section Proofs.
                ** repeat intro; repeat rewrite map_map; simpl.
                   destruct (in_dec string_dec k
                                    (map (fun x => (name ++ String "_" (natToHexStr x))%string)
-                                        (seq 0 (wordToNat (val F1))))).
+                                        (seq 0 (wordToNat (val Fin.F1))))).
                   --- left; intro.
                       rewrite in_map_iff in i, H; dest.
                       rewrite <- H in H2.
@@ -1460,7 +1460,7 @@ Section Proofs.
                        destruct lt_dec; [destruct weq|]; auto.
                        +++ exfalso.
                            apply n.
-                           rewrite to_nat_of_nat; simpl.
+                           rewrite Fin.to_nat_of_nat; simpl.
                            rewrite natToWord_wordToNat; reflexivity.
                        +++ exfalso; contradiction.
                    --- rewrite map_map; simpl; intro.
@@ -1473,8 +1473,8 @@ Section Proofs.
                 ** intro; rewrite map_map; cbn [map fst].
                    destruct (in_dec string_dec k
                                     (map (fun x : nat => (name ++ "_" ++ natToHexStr x)%string)
-                                         (seq (S (wordToNat (val F1)))
-                                              (size - S (wordToNat (val F1)))))); auto.
+                                         (seq (S (wordToNat (val Fin.F1)))
+                                              (size - S (wordToNat (val Fin.F1)))))); auto.
                    right; intro.
                    inv H; [|inv H1].
                    rewrite in_map_iff in i; dest.
@@ -1495,7 +1495,7 @@ Section Proofs.
                            destruct lt_dec; auto.
                            destruct weq; auto.
                            exfalso.
-                           rewrite to_nat_of_nat in e.
+                           rewrite Fin.to_nat_of_nat in e.
                            rewrite e, in_seq in H.
                            simpl in H; destruct H.
                            rewrite wordToNat_natToWord_eqn, Nat.mod_small in H; [lia|].
@@ -1504,8 +1504,8 @@ Section Proofs.
                        +++ intro; repeat rewrite map_map; cbn [map fst].
                            destruct (in_dec string_dec k
                                             (map (fun x => (name ++ "_" ++ natToHexStr x)%string)
-                                                 (seq (S (wordToNat (val F1)))
-                                                      (size - S (wordToNat (val F1)))))); auto.
+                                                 (seq (S (wordToNat (val Fin.F1)))
+                                                      (size - S (wordToNat (val Fin.F1)))))); auto.
                            left; intro.
                            rewrite in_map_iff in *; dest; subst.
                            rewrite in_seq in *.
