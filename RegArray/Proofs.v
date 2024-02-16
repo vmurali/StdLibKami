@@ -956,7 +956,7 @@ Proof.
                                    idx (f idx, existT _ (SyntaxKind k) val))) at 1.
   unfold impl_write in H2.
   specialize
-    gatherActions_effectful with (f := (fun x => ((Const _ (k := Void) Default)))) as Q.
+    gatherActions_effectful with (k_in := Void) (f := (fun x => ((Const _ (k := Void) Default)))) as Q.
   simpl in Q.
   eapply Q; eauto.
   clear P P0 H2 Q.

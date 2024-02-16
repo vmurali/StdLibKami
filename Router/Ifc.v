@@ -26,7 +26,7 @@ Section Ifc.
       regs: list RegInitT;
       regFiles: list RegFileBase;
       sendReq: forall ty, ty OutReq -> ActionT ty Bool;
-      pollRules (callback: forall {ty}, ty respK -> ActionT ty Void): list (forall {ty}, ActionT ty Void);
+      pollRules (callback: forall {ty}, ty respK -> ActionT ty Void): list (forall ty, ActionT ty Void);
       finishRule: forall ty, ActionT ty Void;
     }.
 End Ifc.
