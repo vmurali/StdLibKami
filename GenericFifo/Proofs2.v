@@ -262,7 +262,7 @@ Section Proofs.
                rewrite Z.mod_0_l in n;
                  [|specialize (Z_of_nat_pow_2_gt_0 (Nat.log2_up Fifo.Ifc.size + 1)) as P; lia].
                rewrite Z.mod_small in n; [|split; [lia|]].
-               ++ rewrite snoc_rapp, app_length; simpl; lia.
+               ++ rewrite snoc_rapp, length_app; simpl; lia.
                ++ rewrite pow2_of_nat, <- Nat2Z.inj_lt.
                   apply (Nat.le_lt_trans _ Fifo.Ifc.size); [lia|].
                   apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up Fifo.Ifc.size)));

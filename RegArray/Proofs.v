@@ -224,21 +224,21 @@ Proof.
     destruct (le_lt_eq_dec _ _ H).
     + rewrite seq_eq, map_app, nth_error_app1.
       * apply IHsize; assumption.
-      * rewrite map_length, seq_length; assumption.
+      * rewrite length_map, length_seq; assumption.
     + rewrite seq_eq, map_app, nth_error_app2.
-      * rewrite map_length, seq_length, plus_O_n, e, diag; simpl.
+      * rewrite length_map, length_seq, plus_O_n, e, diag; simpl.
         rewrite Nat.eqb_refl; reflexivity.
-      * rewrite map_length, seq_length; lia.
+      * rewrite length_map, length_seq; lia.
   - induction size; [lia|].
     apply -> Nat.lt_succ_r in H.
     destruct (le_lt_eq_dec _ _ H).
     + rewrite seq_eq, map_app, nth_error_app1.
       * apply IHsize; assumption.
-      * rewrite map_length, seq_length; assumption.
+      * rewrite length_map, length_seq; assumption.
     + rewrite seq_eq, map_app, nth_error_app2.
-      * rewrite map_length, seq_length, plus_O_n, e, diag; simpl.
+      * rewrite length_map, length_seq, plus_O_n, e, diag; simpl.
         rewrite Nat.eqb_refl; reflexivity.
-      * rewrite map_length, seq_length; lia.
+      * rewrite length_map, length_seq; lia.
 Qed.
 
 Lemma sparse_size_le {A : Type} (l : list A):
@@ -274,14 +274,14 @@ Proof.
   destruct (le_lt_eq_dec _ _ H), (le_lt_eq_dec _ _ H0).
   - rewrite nth_error_app1.
     + apply IHsize; auto.
-    + rewrite map_length, seq_length; assumption.
+    + rewrite length_map, length_seq; assumption.
   - rewrite nth_error_app2.
-    + rewrite map_length, seq_length, e, diag; simpl.
+    + rewrite length_map, length_seq, e, diag; simpl.
       destruct Nat.eqb eqn:G; auto.
       exfalso.
       rewrite Nat.eqb_eq in G.
       apply H1; rewrite e; assumption.
-    + rewrite map_length, seq_length; lia.
+    + rewrite length_map, length_seq; lia.
   - rewrite nth_error_app1.
     specialize (sparse_size_le l def (Nat.le_refl size)) as P.
     + apply nth_error_map_Some2.
@@ -290,7 +290,7 @@ Proof.
       destruct Nat.eqb eqn:G; auto.
       exfalso.
       rewrite Nat.eqb_eq in G; lia.
-    + rewrite map_length, seq_length; assumption.
+    + rewrite length_map, length_seq; assumption.
   - exfalso.
     subst; auto.
 Qed.
@@ -299,7 +299,7 @@ Lemma length_sparseList {A : Type} (def : A) (l : list A) (n size : nat) :
   length (sparseList def l n size) = size.
 Proof.
   unfold sparseList.
-  rewrite map_length, seq_length; reflexivity.
+  rewrite length_map, length_seq; reflexivity.
 Qed.
 
 Lemma nth_default_map {A B : Type} (f : A -> B) l def n :
@@ -331,7 +331,7 @@ Proof.
   intros.
   unfold sparseList', sparseList, nth_default, defList.
   rewrite nth_error_app1; auto.
-  assert (sth: Datatypes.length l1 + (size - Datatypes.length l1) = size) by (rewrite app_length in H; lia).
+  assert (sth: Datatypes.length l1 + (size - Datatypes.length l1) = size) by (rewrite length_app in H; lia).
   rewrite <- sth at 1.
   - rewrite seq_app, map_app.
     f_equal; simpl.
@@ -354,7 +354,7 @@ Proof.
   intros.
   unfold sparseList, nth_default, defList'.
   rewrite <- nth_error_app2; auto.
-  assert (sth: Datatypes.length l1 + (size - Datatypes.length l1) = size) by (rewrite app_length in H; lia).
+  assert (sth: Datatypes.length l1 + (size - Datatypes.length l1) = size) by (rewrite length_app in H; lia).
   rewrite <- sth at 1.
   - rewrite seq_app, map_app.
     f_equal.
@@ -387,7 +387,7 @@ Proof.
   intros.
   specialize (@sparseList_app1 _ def l1 l2 m (length (l1 ++ l2)) ltac:(auto) ltac:(auto)) as P.
   unfold sparseList', defList', defList in *.
-  rewrite app_length, Nat.add_comm, Nat.add_sub in *.
+  rewrite length_app, Nat.add_comm, Nat.add_sub in *.
   assumption.
 Qed.
 
@@ -399,7 +399,7 @@ Proof.
   intros.
   specialize (@sparseList_app2 _ def l1 l2 m (length (l1 ++ l2)) ltac:(auto) ltac:(auto)) as P.
   unfold sparseList', defList' in *.
-  rewrite app_length, Nat.add_comm, Nat.add_sub in *.
+  rewrite length_app, Nat.add_comm, Nat.add_sub in *.
   assumption.
 Qed.
 
@@ -531,7 +531,7 @@ Proof.
       simpl.
       destruct weq; simpl; auto.
       exfalso.
-      rewrite map_length, seq_length, Nat.add_0_r in e.
+      rewrite length_map, length_seq, Nat.add_0_r in e.
       assert (wordToNat (natToWord (Nat.log2_up size') (size)) = wordToNat idx) as P.
       { rewrite e; reflexivity. }
       rewrite (wordToNat_natToWord_eqn _ size), Nat.mod_small in P; [lia|].
@@ -558,12 +558,12 @@ Proof.
     dest; repeat split; eauto.
   - apply inversionSemAction in H2; dest; subst.
     apply evalExpr_Kor_sparseList.
-    apply eq_sym, map_length.
+    apply eq_sym, length_map.
   - clear H0.
     destruct (le_lt_dec (length (rev l)) (wordToNat idx)).
-    + rewrite sparseList'_def; [|rewrite map_length; assumption].
+    + rewrite sparseList'_def; [|rewrite length_map; assumption].
       unfold defList'.
-      rewrite map_length, rev_length in *.
+      rewrite length_map, length_rev in *.
       apply defList_helper; auto.
     + enough (forall size size' (idx : word (Nat.log2_up size'))
                      (Hsize : size <= size')
@@ -583,7 +583,7 @@ Proof.
                                      (map (fun x => Var _ (SyntaxKind k) x) (rev l))
                                      (wordToNat idx) size)) as P0.
       { unfold sparseList'.
-        rewrite map_length, rev_length in *.
+        rewrite length_map, length_rev in *.
         apply P0; auto.
       }
       clear - H.
@@ -604,7 +604,7 @@ Proof.
               apply inversionSemAction in H2; dest; subst.
               repeat split; auto.
               simpl.
-              destruct weq; simpl; rewrite map_length, seq_length, Nat.add_0_r in *.
+              destruct weq; simpl; rewrite length_map, length_seq, Nat.add_0_r in *.
               ** destruct Nat.eqb eqn:G.
                  --- rewrite nth_default_map, map_map, map_id; simpl in *.
                      unfold valsToRegs in H1.
@@ -647,7 +647,7 @@ Proof.
               apply inversionSemAction in H2; dest; subst.
               repeat split; auto.
               simpl.
-              destruct weq; simpl; rewrite map_length, seq_length, Nat.add_0_r in *.
+              destruct weq; simpl; rewrite length_map, length_seq, Nat.add_0_r in *.
               ** destruct Nat.eqb eqn:G.
                  --- unfold valsToRegs in H1.
                      rewrite in_map_iff in H1; dest.
@@ -855,7 +855,7 @@ Proof.
     + exfalso; simpl in H4; contradiction.
     + unfold tag in *.
       rewrite seq_eq, map_app in *.
-      rewrite tagApp, in_app_iff, map_length, seq_length, Nat.add_0_r in H4.
+      rewrite tagApp, in_app_iff, length_map, length_seq, Nat.add_0_r in H4.
       repeat (apply inversionSemAction in H3; dest; subst).
       rewrite SubList_app_l_iff in H2; dest.
       destruct H4.
@@ -963,7 +963,7 @@ Proof.
   destruct (le_lt_dec size idx).
   - rewrite replace_nth_n_le.
     + unfold valsToRegs.
-      rewrite firstn_map, rev_length, map_map, firstn_seq_le; auto.
+      rewrite firstn_map, length_rev, map_map, firstn_seq_le; auto.
       induction size.
       * constructor.
       * unfold tag.
@@ -983,7 +983,7 @@ Proof.
            rewrite (H1 _ _ H2) in *; EqDep_subst.
            destruct weq; auto.
            exfalso.
-           rewrite map_length, seq_length, Nat.add_0_r in e.
+           rewrite length_map, length_seq, Nat.add_0_r in e.
            assert (@wordToNat (Nat.log2_up size') ($ size) = wordToNat (writeRq Fin.F1)) as P.
            { rewrite e; reflexivity. }
            rewrite wordToNat_natToWord_eqn, Nat.mod_small in P.
@@ -994,10 +994,10 @@ Proof.
               apply log2_up_pow2.
     + rewrite firstn_length_le; auto.
       unfold valsToRegs.
-      rewrite map_length, rev_length, seq_length; assumption.
+      rewrite length_map, length_rev, length_seq; assumption.
   - unfold valsToRegs.
     unfold replace_nth.
-    rewrite firstn_map, skipn_map, firstn_seq_le, skipn_seq_le, Nat.add_0_l, tl_map, tl_seq;[| |rewrite rev_length]; try lia.
+    rewrite firstn_map, skipn_map, firstn_seq_le, skipn_seq_le, Nat.add_0_l, tl_map, tl_seq;[| |rewrite length_rev]; try lia.
     + assert (size - idx <> 0) as P by lia.
       rewrite (seq_extract1 P idx).
       cbn [map hd_error].
@@ -1010,7 +1010,7 @@ Proof.
       repeat rewrite tagApp.
       repeat rewrite map_app.
       rewrite Nat.add_0_r.
-      repeat rewrite map_length, seq_length, Nat.add_1_l.
+      repeat rewrite length_map, length_seq, Nat.add_1_l.
       cbn [seq].
       repeat apply Forall2_app.
       * assert (idx < size') as P0 by lia.
@@ -1038,7 +1038,7 @@ Proof.
         induction n.
         -- constructor.
         -- intros;
-             rewrite seq_eq, map_app, tagApp, map_length, seq_length, Nat.add_0_r, Nat.add_0_l.
+             rewrite seq_eq, map_app, tagApp, length_map, length_seq, Nat.add_0_r, Nat.add_0_l.
            repeat rewrite map_app.
            apply Forall2_app.
            ++ apply IHn; lia.
@@ -1069,10 +1069,10 @@ Proof.
         split; auto; simpl.
         destruct weq; auto.
         exfalso.
-        rewrite map_length, seq_length in n.
+        rewrite length_map, length_seq in n.
         unfold idx in n.
         rewrite natToWord_wordToNat in n; contradiction.
-      * simpl; rewrite map_length, seq_length.
+      * simpl; rewrite length_map, length_seq.
         assert (size - idx - 1 = size - (S idx)) as P0 by lia.
         rewrite P0; clear P0 P.
         enough (
@@ -1116,7 +1116,7 @@ Proof.
            rewrite (H1 _ _ H4) in *.
            destruct weq; simpl; auto.
            exfalso.
-           rewrite map_length, seq_length in e.
+           rewrite length_map, length_seq in e.
            assert (@wordToNat (Nat.log2_up size') $ (m + n) = wordToNat (writeRq Fin.F1)) as P.
               { rewrite e; reflexivity. }
               rewrite wordToNat_natToWord_eqn, Nat.mod_small in P.
@@ -1200,7 +1200,7 @@ Proof.
            repeat intro; inv H19;[| inv H20].
            exact H12.
       * simpl in H4; destruct H4; [|contradiction].
-        rewrite map_length, seq_length in H4; inv H4.
+        rewrite length_map, length_seq in H4; inv H4.
         rewrite SubList_map_iff in H2, H6; dest.
         split.
         -- exists (x0 ++ x1).
@@ -1251,8 +1251,8 @@ Proof.
   repeat rewrite skipn_app.
   repeat rewrite firstn_map.
   repeat rewrite skipn_map.
-  repeat rewrite map_length.
-  repeat rewrite seq_length.
+  repeat rewrite length_map.
+  repeat rewrite length_seq.
   rewrite diag; simpl.
   rewrite (@firstn_seq_le i start i (Nat.le_refl _)),
   (@skipn_seq_le i start i (Nat.le_refl _)),
@@ -1319,7 +1319,7 @@ Section Proofs.
                    Spec.read, Spec.write, Utila.tag; intros.
     - red; intros; try Record_destruct.
       assert (length (rev (list_arr arrayVal)) = size) as P.
-      { rewrite rev_length, <- list_arr_length; reflexivity. }
+      { rewrite length_rev, <- list_arr_length; reflexivity. }
       assert (forall n m, f n = f m -> n = m) as P0.
       { unfold f; intros.
         repeat rewrite append_remove_prefix in H.
@@ -1347,7 +1347,7 @@ Section Proofs.
       apply P.
     - red; intros; try Record_destruct.
       assert (length (rev (list_arr arrayVal)) = size) as P.
-      { rewrite rev_length, <- list_arr_length; reflexivity. }
+      { rewrite length_rev, <- list_arr_length; reflexivity. }
       assert (forall n m, f n = f m -> n = m) as P0.
       { unfold f; intros.
         repeat rewrite append_remove_prefix in H.
@@ -1366,8 +1366,8 @@ Section Proofs.
           econstructor 1 with (arrayVal := arrayVal).
           -- reflexivity.
           -- unfold valsToRegs, f.
-             rewrite <- list_arr_length, firstn_all2; [|rewrite map_length, seq_length; auto].
-             rewrite replace_nth_n_le; [|rewrite map_length, seq_length; auto].
+             rewrite <- list_arr_length, firstn_all2; [|rewrite length_map, length_seq; auto].
+             rewrite replace_nth_n_le; [|rewrite length_map, length_seq; auto].
              apply doUpdRegs_idemp.
              rewrite map_map; simpl.
              clear - P0; induction size.
@@ -1398,7 +1398,7 @@ Section Proofs.
                                               else arrayVal i)).
           -- reflexivity.
           -- unfold valsToRegs, f.
-             rewrite <- list_arr_length, firstn_all2; [|rewrite map_length, seq_length; auto].
+             rewrite <- list_arr_length, firstn_all2; [|rewrite length_map, length_seq; auto].
              rewrite <- list_arr_length.
              rewrite replace_nth_map_seq, Nat.add_0_l; auto.
              rewrite (split_seq 0 l); repeat rewrite map_app.

@@ -206,7 +206,7 @@ Section Proofs.
         -- destruct x4, implRegValL; simpl in *; auto; lia.
         -- destruct isEq; simpl in *; auto.
            destruct (x4 || emptyb implRegValL) eqn:G; simpl; try discriminate; simpl.
-           rewrite snoc_rapp, app_length; simpl.
+           rewrite snoc_rapp, length_app; simpl.
            destruct wltu eqn:G0 in n.
            ++ rewrite wltu_lt, wordToNat_natToWord in G0; try lia.
               unfold lgSize, size.
@@ -397,7 +397,7 @@ Section Proofs.
                 apply (Z.lt_le_trans _ (2 ^ Z.of_nat (Nat.log2_up (sizeL) + 1))); auto.
                 apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r; [lia|].
                 apply Nat.log2_up_le_mono; lia.
-          -- rewrite sizeSum, app_length in e.
+          -- rewrite sizeSum, length_app in e.
              arithmetizeWord; simpl in H5.
              rewrite wordToNat_natToWord in G;
                [rewrite Z.mod_0_l, Z.mod_small in H5; try lia|].
@@ -446,7 +446,7 @@ Section Proofs.
                 apply (Nat.le_lt_trans _ (2 ^ (Nat.log2_up sizeL)))
                 ;[apply log2_up_pow2|].
                 apply Nat.pow_lt_mono_r; lia.
-          -- rewrite sizeSum, app_length in e.
+          -- rewrite sizeSum, length_app in e.
              arithmetizeWord; simpl in H5.
              rewrite Z.mod_0_l in *;
                [ | unfold lgSize, size;
@@ -502,7 +502,7 @@ Section Proofs.
              apply eq_wordVal; simpl; rewrite Z.mod_small; auto.
              specialize (wordBound _ x0) as P1; apply boundProofZ in P1; dest; auto.
         * exfalso.
-          rewrite wltu_ge, sizeSum, app_length, <- Nat.nlt_ge in G0; apply G0.
+          rewrite wltu_ge, sizeSum, length_app, <- Nat.nlt_ge in G0; apply G0.
           repeat rewrite wordToNat_natToWord.
           -- rewrite wordToNat_natToWord in G;[lia|].
              unfold lgSize, size.
@@ -564,7 +564,7 @@ Section Proofs.
                  as P.
           {
             assert (length implRegValR = sizeR) as P.
-            { rewrite wltu_ge, sizeSum, app_length in G1.
+            { rewrite wltu_ge, sizeSum, length_app in G1.
               do 2 rewrite wordToNat_natToWord in G1;[ lia| | |];
                    unfold lgSize; rewrite sizeSum;
                      apply (Nat.le_lt_trans _ (sizeL + sizeR)); try lia;
@@ -572,7 +572,7 @@ Section Proofs.
                        try apply log2_up_pow2;
                        apply Nat.pow_lt_mono_r; lia.
             }
-            rewrite sizeSum, app_length, P; lia. }
+            rewrite sizeSum, length_app, P; lia. }
           rewrite P.
           unfold lgSize, ZeroExtendTruncLsb.
           destruct lt_dec.
@@ -828,7 +828,7 @@ Section Proofs.
                   [apply log2_up_pow2| apply Nat.pow_lt_mono_r]; lia.
           -- destruct wltu eqn:G0.
              ++ rewrite wltu_lt in G0.
-                rewrite sizeSum, app_length in e.
+                rewrite sizeSum, length_app in e.
                 apply eq_word in e; simpl in e.
                 rewrite Z.mod_0_l, Z.mod_small in e;
                   rewrite wordToNat_natToWord in G0; try lia.
@@ -854,7 +854,7 @@ Section Proofs.
              ++ apply neq_wordVal in n.
                 apply eq_word in e; simpl in *.
                 unfold lgSize, size in n.
-                unfold lgSize in e; rewrite sizeSum, app_length in e.
+                unfold lgSize in e; rewrite sizeSum, length_app in e.
                 rewrite Z.mod_0_l in n, e;
                   [| specialize (Z_of_nat_pow_2_gt_0 (Nat.log2_up (sizeL + sizeR) + 1)) as P;
                      lia
@@ -890,7 +890,7 @@ Section Proofs.
               apply HfifoR4. }
         all : auto.
         * destruct weq; simpl; auto.
-          rewrite snoc_rapp, app_length; simpl.
+          rewrite snoc_rapp, length_app; simpl.
           destruct wltu eqn:G;
             [rewrite wltu_lt in G| rewrite wltu_ge in G].
           -- clear HdoUpdRegsR.
@@ -931,12 +931,12 @@ Section Proofs.
                    destruct wltu eqn:G0; [rewrite wltu_lt in G0|rewrite wltu_ge in G0].
                    --- rewrite wordToNat_natToWord in n; [contradiction|apply zero_lt_pow2].
                    --- apply neq_wordVal in n; simpl in n.
-                       unfold lgSize in n; rewrite sizeSum, app_length in n.
+                       unfold lgSize in n; rewrite sizeSum, length_app in n.
                        rewrite Z.mod_0_l in n;
                          [|specialize (Z_of_nat_pow_2_gt_0 ((Nat.log2_up (sizeL + sizeR) + 1)))
                             as P; lia].
                        rewrite Z.mod_small in n.
-                       +++ rewrite sizeSum, app_length in G0.
+                       +++ rewrite sizeSum, length_app in G0.
                            do 3 rewrite wordToNat_natToWord in G0; try lia.
                            *** apply zero_lt_pow2.
                            *** rewrite wordToNat_natToWord; apply zero_lt_pow2.
@@ -1028,7 +1028,7 @@ Section Proofs.
                                  auto.
                                apply Z.pow_le_mono_r, inj_le, Nat.add_le_mono_r; [lia|].
                                apply Nat.log2_up_le_mono; lia.
-                       +++ rewrite sizeSum, app_length in e.
+                       +++ rewrite sizeSum, length_app in e.
                            arithmetizeWord; simpl in H13.
                            rewrite wordToNat_natToWord in G;
                              [rewrite Z.mod_0_l, Z.mod_small in H13; try lia|].
@@ -1080,7 +1080,7 @@ Section Proofs.
                                ;[apply log2_up_pow2|].
                                apply Nat.pow_lt_mono_r; lia.
                        +++ clear HdoUpdRegsR.
-                           rewrite sizeSum, app_length in e.
+                           rewrite sizeSum, length_app in e.
                            apply neq_wordVal in n; simpl in n.
                            arithmetizeWord; simpl in H13.
                            rewrite Z.mod_0_l in *;
@@ -1166,7 +1166,7 @@ Section Proofs.
                      [rewrite wltu_lt in G0| rewrite wltu_ge in G0].
                    --- exfalso.
                        specialize (wordBound _ x) as P; rewrite boundProofZIff in P.
-                       rewrite sizeSum, app_length in G.
+                       rewrite sizeSum, length_app in G.
                        do 2 rewrite wordToNat_natToWord in G;
                             [rewrite wordToNat_natToWord in G0; try lia | | | ].
                        +++ unfold lgSize, size.
@@ -1200,7 +1200,7 @@ Section Proofs.
                            *** rewrite e0 in G1.
                                rewrite wordToNat_natToWord in G1; try lia.
                                apply zero_lt_pow2.
-                           *** rewrite sizeSum, app_length in e.
+                           *** rewrite sizeSum, length_app in e.
                                apply neq_wordVal in n.
                                apply eq_word in e; simpl in *.
                                rewrite Zmod_0_l in *; rewrite Z.mod_small in *
@@ -1218,7 +1218,7 @@ Section Proofs.
                                     ;[apply log2_up_pow2|].
                                     apply Nat.pow_lt_mono_r; lia.
                        +++ destruct weq; simpl in *; auto.
-                           rewrite sizeSum, app_length in e.
+                           rewrite sizeSum, length_app in e.
                            apply neq_wordVal in n.
                            apply eq_word in e; simpl in *.
                            rewrite Zmod_0_l in *; rewrite Z.mod_small in *
@@ -1248,7 +1248,7 @@ Section Proofs.
                                apply zero_lt_pow2.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2|rewrite wltu_ge in G2]; auto.
-                               rewrite snoc_rapp, app_length in G2; simpl in G2.
+                               rewrite snoc_rapp, length_app in G2; simpl in G2.
                                rewrite (Nat.add_1_r (length implRegValL))in G2.
                                lia.
                        +++ destruct weq; simpl in *.
@@ -1258,11 +1258,11 @@ Section Proofs.
                                apply zero_lt_pow2.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2
-                                 |rewrite wltu_ge in G2; rewrite snoc_rapp, app_length;
+                                 |rewrite wltu_ge in G2; rewrite snoc_rapp, length_app;
                                   simpl; rewrite (Nat.add_1_r (length implRegValL));
                                   reflexivity].
                                exfalso.
-                               rewrite snoc_rapp, app_length in G2; simpl in G2.
+                               rewrite snoc_rapp, length_app in G2; simpl in G2.
                                rewrite (Nat.add_1_r (length implRegValL))in G2.
                                lia.
                    --- destruct wltu eqn:G1;
@@ -1282,7 +1282,7 @@ Section Proofs.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2|rewrite wltu_ge in G2]; auto.
                                exfalso.
-                               rewrite snoc_rapp, app_length in G2; simpl in G2.
+                               rewrite snoc_rapp, length_app in G2; simpl in G2.
                                rewrite (Nat.add_1_r (length implRegValL))in G2.
                                lia.
                        +++ destruct weq; simpl in *.
@@ -1299,18 +1299,18 @@ Section Proofs.
                                apply Nat.pow_lt_mono_r; lia.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2
-                                 |rewrite wltu_ge in G2; rewrite snoc_rapp, app_length;
+                                 |rewrite wltu_ge in G2; rewrite snoc_rapp, length_app;
                                   simpl; rewrite (Nat.add_1_r (length implRegValL));
                                   reflexivity].
                                exfalso.
-                               rewrite snoc_rapp, app_length in G2; simpl in G2.
+                               rewrite snoc_rapp, length_app in G2; simpl in G2.
                                rewrite (Nat.add_1_r (length implRegValL))in G2.
                                lia.
                 ** destruct wltu eqn:G0;
                      [rewrite wltu_lt in G0|rewrite wltu_ge in G0].
                    --- exfalso.
                        specialize (wordBound _ x) as P; rewrite boundProofZIff in P.
-                       rewrite sizeSum, app_length in G.
+                       rewrite sizeSum, length_app in G.
                        do 2 rewrite wordToNat_natToWord in G;
                             [rewrite wordToNat_natToWord in G0; try lia | | | ].
                        +++ unfold lgSize, size.
@@ -1342,7 +1342,7 @@ Section Proofs.
                          [rewrite wltu_lt in G1|rewrite wltu_ge in G1].
                        +++ destruct weq; simpl in *.
                            *** exfalso.
-                               rewrite sizeSum, app_length in G, n.
+                               rewrite sizeSum, length_app in G, n.
                                do 2 rewrite wordToNat_natToWord in G;
                                     [apply neq_wordVal in n; apply eq_word in e; simpl in *;
                                      rewrite Z.mod_0_l, Z.mod_small in n, e | | |]; try lia.
@@ -1378,12 +1378,12 @@ Section Proofs.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2|rewrite wltu_ge in G2]; auto.
                                exfalso.
-                               rewrite snoc_rapp, app_length in G2; simpl in G2.
+                               rewrite snoc_rapp, length_app in G2; simpl in G2.
                                rewrite (Nat.add_1_r (length implRegValL))in G2.
                                lia.
                        +++ destruct weq; simpl in *.
                            *** exfalso.
-                               rewrite sizeSum, app_length in G, n.
+                               rewrite sizeSum, length_app in G, n.
                                do 2 rewrite wordToNat_natToWord in G;
                                     [apply neq_wordVal in n; apply eq_word in e; simpl in *;
                                      rewrite Z.mod_0_l, Z.mod_small in n, e | | |]; try lia.
@@ -1419,10 +1419,10 @@ Section Proofs.
                            *** destruct wltu eqn:G2;
                                  [rewrite wltu_lt in G2|rewrite wltu_ge in G2].
                                ---- exfalso.
-                                    rewrite snoc_rapp, app_length in G2; simpl in G2.
+                                    rewrite snoc_rapp, length_app in G2; simpl in G2.
                                     rewrite (Nat.add_1_r (length implRegValL))in G2.
                                     lia.
-                               ---- rewrite snoc_rapp, app_length; simpl.
+                               ---- rewrite snoc_rapp, length_app; simpl.
                                     rewrite (Nat.add_1_r (length implRegValL)); reflexivity.
         * rewrite doUpdReg_preserves_getKindAttr; auto.
         * rewrite doUpdRegs_DisjKey; try solve_keys; auto.

@@ -432,7 +432,7 @@ Section Proofs.
                                        (convertToList x29)) = 0) as P3.
                      { setoid_rewrite H1; simpl; reflexivity. }
                      unfold convertToList, list_arr in P3.
-                     rewrite rotateLength, map_length, getFins_length in P3; contradiction.
+                     rewrite rotateLength, length_map, getFins_length in P3; contradiction.
                ++ rewrite tailCorrect; auto.
                   rewrite Zplus_mod_idemp_l, Zplus_mod_idemp_r, Zminus_mod_idemp_r.
                   assert (x19 <> x13) as n' by auto.
