@@ -29,7 +29,7 @@ Section Granule.
     intros.
     pose proof (Nat.div_mod (x + (y-1)) y ltac:(lia)) as sth.
     rewrite Nat.mul_comm in sth.
-    pose proof (Nat.mod_le (x + (y-1)) _ H) as sth2. 
+    pose proof (Nat.Div0.mod_le (x + (y-1))) as sth2. 
     assert (sth3: divCeil x y * y = x + (y-1) - ((x + (y-1))mod y)) by lia.
     Opaque Nat.div.
     simpl.
@@ -507,5 +507,4 @@ End Granule.
   (*   auto. *)
   (*   auto. *)
   (* Defined. *)
-
 

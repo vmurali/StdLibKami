@@ -458,7 +458,7 @@ Section Proofs.
                      repeat rewrite <- Zmod_mod'; try lia.
                      --- rewrite Z.add_mod_idemp_l; lia.
                      --- apply OMEGA2; [apply Z.mod_pos_bound|]; lia.
-                  ** rewrite H8, Z_mod_same_full, Nat.mod_0_l; auto.
+                  ** rewrite H8, Z_mod_same_full, Nat.Div0.mod_0_l; auto.
                      rewrite <- (Nat2Z.id size) at 3.
                      rewrite <- Zmod_mod', Zplus_mod_idemp_l, Zmod_mod'
                      , H8, Z.mul_comm, <- Zmod_mod', Z.mod_mul; try lia.
